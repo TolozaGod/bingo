@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bingo - Tabela</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ffc9d3; font-family: Arial, Helvetica, sans-serif; min-height: 100vh; padding: 12px; }
+  .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 1400px; margin: 0 auto; }
+  .letter { text-align: center; color: #d6338a; font-weight: 900; font-size: clamp(20px, 3vw, 34px); padding: 10px 0; }
+  .col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-content: start; }
+  .cell { border: 2px outset #cfa9b0; background: #ffc9d3; color: #333; font-weight: 900;
+    font-size: clamp(16px, 2.6vw, 30px); text-align: center; padding: clamp(8px, 1.6vw, 18px) 0; transition: all .2s; }
+  .cell.last { grid-column: span 2; }
+  .cell.on { background: #d6338a; color: #fff; border-color: #a0206a; }
+  .cell.new { animation: pop .8s; }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+</style>
+</head>
+<body>
+<div class="board" id="board"></div>
+<script>
+  const board = document.getElementById('board');
+  const cells = {};
+  'BINGO'.split('').forEach((l) => {
+    const h = document.createElement('div'); h.className = 'letter'; h.textContent = l; board.appendChild(h);
+  });
+  for (let c = 0; c < 5; c++) {
+    const col = document.createElement('div'); col.className = 'col';
+    for (let i = 1; i <= 18; i++) {
+      const n = c * 18 + i;
+      const d = document.createElement('div');
+      d.className = 'cell';
+      d.textContent = n; cells[n] = d; col.appendChild(d);
+    }
+    board.appendChild(col);
+  }
+  let prev = new Set();
+  function render(nums) {
+    const cur = new Set(nums);
+    for (const n in cells) {
+      const el = cells[n], on = cur.has(+n);
+      el.classList.toggle('on', on);
+      if (on && !prev.has(+n)) { el.classList.remove('new'); void el.offsetWidth; el.classList.add('new'); }
+    }
+    prev = cur;
+  }
+  const es = new EventSource('/events');
+  es.onmessage = (e) => render(JSON.parse(e.data).numbers);
+</script>
+</body>
+</html>

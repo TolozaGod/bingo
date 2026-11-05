@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bingo - Controle</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #2b2b3a; color: #fff; font-family: Arial, Helvetica, sans-serif; display: flex; justify-content: center; padding: 20px; }
+  .card { width: 100%; max-width: 420px; }
+  h1 { text-align: center; color: #ff8fc0; }
+  input { width: 100%; font-size: 48px; text-align: center; padding: 14px; border-radius: 10px; border: 3px solid #d6338a; background: #1e1e2a; color: #fff; }
+  .row { display: flex; gap: 10px; margin-top: 12px; }
+  button { flex: 1; font-size: 22px; font-weight: bold; padding: 16px; border: 0; border-radius: 10px; color: #fff; cursor: pointer; }
+  #add { background: #2e9e5b; } #rem { background: #c0392b; }
+  #msg { min-height: 24px; margin-top: 10px; text-align: center; color: #ffd166; }
+  #clear { position: relative; overflow: hidden; width: 100%; margin-top: 30px; background: #555; user-select: none; touch-action: none; }
+  #clear .bar { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #d6338a; }
+  #clear span { position: relative; }
+  .count { text-align: center; margin-top: 18px; color: #aaa; }
+  .last { text-align: center; margin-top: 8px; color: #ddd; word-break: break-word; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Controle do Bingo</h1>
+  <input id="num" type="number" min="1" max="90" inputmode="numeric" placeholder="1 - 90" autofocus>
+  <div class="row">
+    <button id="add">Adicionar</button>
+    <button id="rem">Remover</button>
+  </div>
+  <div id="msg"></div>
+  <button id="clear"><div class="bar"></div><span>Segure 2s para limpar tudo</span></button>
+  <div class="count" id="count"></div>
+  <div class="last" id="list"></div>
+</div>
+<script>
+  const num = document.getElementById('num'), msg = document.getElementById('msg');
+  async function call(action, body) {
+    const r = await fetch('/api/' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+    const j = await r.json();
+    if (!r.ok) { msg.textContent = j.error; return false; }
+    msg.textContent = ''; return true;
+  }
+  async function act(action) {
+    const n = num.value.trim();
+    if (!n) { msg.textContent = 'Digite um número'; return; }
+    if (await call(action, { number: n })) { num.value = ''; }
+    num.focus();
+  }
+  document.getElementById('add').onclick = () => act('add');
+  document.getElementById('rem').onclick = () => act('remove');
+  num.addEventListener('keydown', (e) => { if (e.key === 'Enter') act('add'); });
+
+  const clear = document.getElementById('clear'), bar = clear.querySelector('.bar'), HOLD = 2000;
+  let start = 0, raf = 0;
+  function tick() {
+    const p = Math.min((performance.now() - start) / HOLD, 1);
+    bar.style.width = p * 100 + '%';
+    if (p >= 1) { stop(); call('clear'); return; }
+    raf = requestAnimationFrame(tick);
+  }
+  function begin(e) { e.preventDefault(); stop(); start = performance.now(); raf = requestAnimationFrame(tick); }
+  function stop() { cancelAnimationFrame(raf); raf = 0; bar.style.width = '0'; }
+  clear.addEventListener('pointerdown', begin);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => clear.addEventListener(ev, stop));
+  clear.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  new EventSource('/events').onmessage = (e) => {
+    const { numbers } = JSON.parse(e.data);
+    document.getElementById('count').textContent = numbers.length + ' / 90 sorteados';
+    document.getElementById('list').textContent = numbers.join(', ');
+  };
+</script>
+</body>
+</html>
