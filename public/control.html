@@ -24,7 +24,7 @@
 <body>
 <div class="card">
   <h1>Controle do Bingo</h1>
-  <input id="num" type="number" min="1" max="90" inputmode="numeric" placeholder="1 - 90" autofocus>
+  <input id="num" type="number" min="1" max="75" inputmode="numeric" placeholder="1 - 75" autofocus>
   <div class="row">
     <button id="add">Adicionar</button>
     <button id="rem">Remover</button>
@@ -68,7 +68,7 @@
 
   new EventSource('/events').onmessage = (e) => {
     const { numbers } = JSON.parse(e.data);
-    document.getElementById('count').textContent = numbers.length + ' / 90 sorteados';
+    document.getElementById('count').textContent = numbers.length + ' / 75 sorteados';
     document.getElementById('list').textContent = numbers.join(', ');
   };
 </script>

@@ -8,7 +8,7 @@ const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, 'drawn.json');
 const drawn = new Set();
 try {
   const saved = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-  (saved.numbers || []).forEach((n) => Number.isInteger(n) && n >= 1 && n <= 90 && drawn.add(n));
+  (saved.numbers || []).forEach((n) => Number.isInteger(n) && n >= 1 && n <= 75 && drawn.add(n));
 } catch {}
 
 function save() {
@@ -63,8 +63,8 @@ http.createServer(async (req, res) => {
     } else {
       const { number } = await readBody(req);
       const n = Number(number);
-      if (!Number.isInteger(n) || n < 1 ||       n > 90) {
-              return send(res, 400, { error: 'Número deve ser inteiro entre 1 e 90' });
+      if (!Number.isInteger(n) || n < 1 ||       n > 75) {
+              return send(res, 400, { error: 'Número deve ser inteiro entre 1 e 75' });
       }
       if (url === '/api/add') drawn.add(n); else drawn.delete(n);
     }
