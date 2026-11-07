@@ -4,7 +4,20 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC = path.join(__dirname, 'public');
+const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, 'drawn.json');
 const drawn = new Set();
+try {
+  const saved = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+  (saved.numbers || []).forEach((n) => Number.isInteger(n) && n >= 1 && n <= 90 && drawn.add(n));
+} catch {}
+
+function save() {
+  const tmp = DATA_FILE + '.tmp';
+  try {
+    fs.writeFileSync(tmp, JSON.stringify({ numbers: [...drawn].sort((a, b) => a - b) }));
+    fs.renameSync(tmp, DATA_FILE);
+  } catch (e) { console.error('Falha ao salvar:', e.message); }
+}
 const clients = new Set();
 
 const state = () => JSON.stringify({ numbers: [...drawn].sort((a, b) => a - b) });
@@ -55,6 +68,7 @@ http.createServer(async (req, res) => {
       }
       if (url === '/api/add') drawn.add(n); else drawn.delete(n);
     }
+    save();
     broadcast();
     return send(res, 200, JSON.parse(state()));
   }
