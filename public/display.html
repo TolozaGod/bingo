@@ -15,6 +15,8 @@
   .cell.last { grid-column: span 2; }
   .cell.on { background: #c8102e; color: #fff; border-color: #7a0f16; }
   .cell.new { animation: pop .8s; }
+  .board.tilt { animation: tilt 1.2s ease-in-out; }
+  @keyframes tilt { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-3deg); } 40% { transform: rotate(3deg); } 60% { transform: rotate(-2deg); } 80% { transform: rotate(2deg); } }
   @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
 </style>
 </head>
@@ -37,7 +39,7 @@
     }
     board.appendChild(col);
   }
-  let prev = new Set();
+  let prev = new Set(), loaded = false;
   function render(nums) {
     const cur = new Set(nums);
     for (const n in cells) {
@@ -45,7 +47,8 @@
       el.classList.toggle('on', on);
       if (on && !prev.has(+n)) { el.classList.remove('new'); void el.offsetWidth; el.classList.add('new'); }
     }
-    prev = cur;
+    if (loaded && cur.has(67) && !prev.has(67)) { board.classList.remove('tilt'); void board.offsetWidth; board.classList.add('tilt'); }
+    prev = cur; loaded = true;
   }
   const es = new EventSource('/events');
   es.onmessage = (e) => render(JSON.parse(e.data).numbers);
