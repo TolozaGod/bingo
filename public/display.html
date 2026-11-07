@@ -31,7 +31,7 @@
     for (let i = 1; i <= 15; i++) {
       const n = c * 15 + i;
       const d = document.createElement('div');
-      d.className = 'cell';
+      d.className = 'cell' + (i === 15 ? ' last' : '');
       d.textContent = n; cells[n] = d; col.appendChild(d);
     }
     board.appendChild(col);
