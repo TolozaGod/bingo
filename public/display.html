@@ -11,7 +11,7 @@
   .letter { text-align: center; color: #ffcc29; font-weight: 900; font-size: clamp(20px, 3vw, 34px); padding: 10px 0; }
   .col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-content: start; }
   .cell { border: 2px outset #e8b923; background: #0b6e3a; color: #ffe27a; font-weight: 900;
-    font-size: clamp(16px, 2.6vw, 30px); text-align: center; padding: clamp(8px, 1.6vw, 18px) 0; transition: all .2s; }
+    font-size: clamp(16px, 2.6vw, 30px); text-align: center; padding: clamp(8px, 1.6vw, 18px) 0; transition: all .2s; cursor: pointer; user-select: none; }
   .cell.last { grid-column: span 2; }
   .cell.on { background: #c8102e; color: #fff; border-color: #7a0f16; }
   .cell.new { animation: pop .8s; }
@@ -32,7 +32,8 @@
       const n = c * 15 + i;
       const d = document.createElement('div');
       d.className = 'cell' + (i === 15 ? ' last' : '');
-      d.textContent = n; cells[n] = d; col.appendChild(d);
+      d.textContent = n; d.onclick = () => fetch('/api/' + (prev.has(n) ? 'remove' : 'add'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: n }) });
+      cells[n] = d; col.appendChild(d);
     }
     board.appendChild(col);
   }
