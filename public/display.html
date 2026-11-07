@@ -6,14 +6,14 @@
 <title>Bingo - Tabela</title>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #ffc9d3; font-family: Arial, Helvetica, sans-serif; min-height: 100vh; padding: 12px; }
+  body { margin: 0; background: #0b6e3a; font-family: Arial, Helvetica, sans-serif; min-height: 100vh; padding: 12px; }
   .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-width: 1400px; margin: 0 auto; }
-  .letter { text-align: center; color: #d6338a; font-weight: 900; font-size: clamp(20px, 3vw, 34px); padding: 10px 0; }
+  .letter { text-align: center; color: #ffcc29; font-weight: 900; font-size: clamp(20px, 3vw, 34px); padding: 10px 0; }
   .col { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-content: start; }
-  .cell { border: 2px outset #cfa9b0; background: #ffc9d3; color: #333; font-weight: 900;
+  .cell { border: 2px outset #e8b923; background: #0b6e3a; color: #ffe27a; font-weight: 900;
     font-size: clamp(16px, 2.6vw, 30px); text-align: center; padding: clamp(8px, 1.6vw, 18px) 0; transition: all .2s; }
   .cell.last { grid-column: span 2; }
-  .cell.on { background: #d6338a; color: #fff; border-color: #a0206a; }
+  .cell.on { background: #c8102e; color: #fff; border-color: #7a0f16; }
   .cell.new { animation: pop .8s; }
   @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
 </style>
